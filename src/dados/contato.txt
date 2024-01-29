@@ -1,5 +1,0 @@
->>>> Contatos <<<<
-Id | Nome
-1 | Alex Araujo
-2 | Joao Gomes
-3 | Silvio Santos
