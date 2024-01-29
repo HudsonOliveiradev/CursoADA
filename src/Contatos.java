@@ -1,6 +1,8 @@
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Contatos {
+public class Contatos implements Serializable {
     private Long id;
     private String nome;
     private String sobreNome;
@@ -9,12 +11,12 @@ public class Contatos {
     public Contatos() {
     }
 
-    public Contatos(Long id, String nome, String sobreNome, List<Telefone> telefones) {
+    public Contatos(Long id, String nome, String sobreNome) {
         this.id = id;
         this.nome = nome;
 
         this.sobreNome = sobreNome;
-        this.telefones = telefones;
+        this.telefones = new ArrayList<>();
     }
 
     public Long getId() {
