@@ -1,6 +1,4 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,12 +69,39 @@ public class agendaTelefonica {
         Calendar calendario = Calendar.getInstance();
         Long id = calendario.getTimeInMillis()/1000;
         contato.setId(id);
-        novoContato.concat(contato.getId().toString() + " ");
+        novoContato.concat(contato.getId().toString() + " | ");
         novoContato.concat(contato.getNome() + " " + contato.getSobreNome());
-        novoContato.concat(" " + contato.getTelefones());
+        novoContato.concat(" | " + contato.getTelefones());
         return novoContato;
     }
-    public static void RemoverContato(){
+    public static void RemoverContato(Long id){
+        File arquivo = new File(Arquivo_Contato);
+        try {
+            FileReader fileReader = new FileReader(arquivo);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String linha;
+
+            StringBuilder textoVazio = new StringBuilder();
+            while ((linha = bufferedReader.readLine()) != null){
+                if(!linha.contains(id.toString())){
+                    textoVazio.append(linha).append(System.lineSeparator());
+                }
+            }
+            bufferedReader.close();
+            fileReader.close();
+
+            FileWriter fileWriter = new FileWriter(arquivo);
+            BufferedWriter bufferedWriter= new BufferedWriter(fileWriter);
+
+            bufferedWriter.write(textoVazio.toString());
+            bufferedWriter.close();
+            fileWriter.close();
+
+            System.out.println("Contato removido com sucesso!");
+
+        } catch (IOException e) {
+            System.err.println("Erro ao remover contato!" + e.getMessage());
+        }
 
     }
 }
