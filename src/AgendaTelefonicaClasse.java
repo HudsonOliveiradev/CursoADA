@@ -1,6 +1,10 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Scanner;
 
 public class agendaTelefonica {
@@ -42,8 +46,37 @@ public class agendaTelefonica {
         try (FileWriter escrever = new FileWriter(Arquivo_Contato, true);
              BufferedWriter bWcompleto = new BufferedWriter(escrever)){
             System.out.println("Digite o Nome");
+            String nome = scanner.nextLine();
+            System.out.println("Digite o Sobrenome");
+            String sobrenome = scanner.nextLine();
+            System.out.println("Digite DDD");
+            String ddd = scanner.nextLine();
+            System.out.println("Digite o número de telefone");
+            Long numero = scanner.nextLong();
+            List<Telefone>telefones = new ArrayList<>();
+            Telefone contatoNum = new Telefone(ddd, numero);
+            telefones.add(contatoNum);
+            Contato nomeCadastrado = new Contato(nome, sobrenome, telefones);
+
+            bWcompleto.write(CriarContato(nomeCadastrado));
+            bWcompleto.newLine();
+
+            System.out.println("Cadastro Finalizado!");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Não foi possível criar contato " + e.getMessage());
         }
+    }
+    public static String CriarContato(Contato contato){
+        String novoContato = "";
+        Calendar calendario = Calendar.getInstance();
+        Long id = calendario.getTimeInMillis()/1000;
+        contato.setId(id);
+        novoContato.concat(contato.getId().toString() + " ");
+        novoContato.concat(contato.getNome() + " " + contato.getSobreNome());
+        novoContato.concat(" " + contato.getTelefones());
+        return novoContato;
+    }
+    public static void RemoverContato(){
+
     }
 }
