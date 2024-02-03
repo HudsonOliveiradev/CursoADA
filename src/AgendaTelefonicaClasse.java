@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class AgendaTelefonicaClasse {
     private static final String Arquivo_Contato = "contatos.txt";
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         boolean emExecucao = true;
@@ -39,6 +39,7 @@ public class AgendaTelefonicaClasse {
         System.out.println("\n 2 - Remover Contato ");
         System.out.println("\n 3 - Editar Contato ");
         System.out.println("\n 4 - Sair ");
+        System.out.println(" Digite a opção desejada: ");
     }
     public static void adcionarContato(){
         try (FileWriter escrever = new FileWriter(Arquivo_Contato, true);
@@ -59,28 +60,26 @@ public class AgendaTelefonicaClasse {
             bWcompleto.write(CriarContato(nomeCadastrado));
             bWcompleto.newLine();
 
-            escrever.close();
-            bWcompleto.close();
-
             System.out.println("Cadastro Finalizado!");
         } catch (IOException e) {
-            System.err.println("Não foi possível criar contato " + e.getMessage());
+            System.err.println("Não foi possível criar contato!" + e.getMessage());
         }
     }
-    public static String CriarContato(Contato contato){
-        String novoContato = "";
+    public static String CriarContato(Contato contato) {
+        StringBuilder novoContato = new StringBuilder();
         Calendar calendario = Calendar.getInstance();
-        Long id = calendario.getTimeInMillis()/1000;
+        Long id = calendario.getTimeInMillis() / 1000;
         contato.setId(id);
-        novoContato.concat(contato.getId().toString() + " | ");
-        novoContato.concat(contato.getNome() + " " + contato.getSobreNome());
-        novoContato.concat(" | " + contato.getTelefones().get(0).getDdd());
-        novoContato.concat(" | " + contato.getTelefones().get(0).getNumero());
-        return novoContato;
+        novoContato.append(contato.getId()).append(" | ");
+        novoContato.append(contato.getNome()).append(" ").append(contato.getSobreNome());
+        novoContato.append(" | ").append(contato.getTelefones().get(0).getDdd());
+        novoContato.append(" | ").append(contato.getTelefones().get(0).getNumero());
+        return novoContato.toString();
     }
+
     public static void removerContato(){
         System.out.println("Qual Id que você deseja remover?");
-        Long id = scanner.nextLong();
+        long id = scanner.nextLong();
         File arquivo = new File(Arquivo_Contato);
         try {
             FileReader fileReader = new FileReader(arquivo);
@@ -89,7 +88,7 @@ public class AgendaTelefonicaClasse {
 
             StringBuilder textoVazio = new StringBuilder();
             while ((linha = bufferedReader.readLine()) != null){
-                if(!linha.contains(id.toString())){
+                if(!linha.contains(Long.toString(id))){
                     textoVazio.append(linha).append(System.lineSeparator());
                 }
             }
@@ -110,13 +109,15 @@ public class AgendaTelefonicaClasse {
         }
     }
 
-    public static void editarContato(){
+    public static void editarContato() {
         System.out.println("Qual Id que você deseja editar?");
-        Long idEditado = scanner.nextLong();
+        long idEditado = scanner.nextLong();
+
+        scanner.nextLine();
 
         File arquivo = new File(Arquivo_Contato);
-        System.out.println("Você deseja editar: nome, ddd ou telefone?");
-        String valorEditado = scanner.nextLine();
+        System.out.println("Você deseja editar: nome, sobrenome, ddd ou telefone?");
+        String valorEditado = scanner.nextLine().toLowerCase();
         int posicaoEditado = 0;
         switch (valorEditado) {
             case "nome":
@@ -133,6 +134,7 @@ public class AgendaTelefonicaClasse {
                 break;
             default:
                 System.out.println("O valor informado deve estar igual ao impresso!");
+                System.out.println("Você deseja editar: nome, sobrenome, ddd ou telefone?");
         }
 
         try {
@@ -141,39 +143,43 @@ public class AgendaTelefonicaClasse {
             String linha;
 
             StringBuilder textoVazio = new StringBuilder();
-            while ((linha = bufferedReader.readLine()) != null){
-                if(linha.contains(idEditado.toString())){
+            while ((linha = bufferedReader.readLine()) != null) {
+                if (linha.contains(Long.toString(idEditado))) {
                     String[] split = linha.split(" ");
 
-                    String linhaEditada = "";
+                    StringBuilder linhaEditada = new StringBuilder();
 
-                    for (int i = 0; i < split.length; i++){
-                        if(i == posicaoEditado){
-                            linhaEditada.concat(valorEditado + " ");
+                    for (int i = 0; i < split.length; i++) {
+                        if (i == posicaoEditado) {
+                            System.out.println("Digite o novo valor:");
+                            String novoValor = scanner.nextLine();
+                            linhaEditada.append(novoValor).append(" ");
                         } else {
-                            linhaEditada.concat(split[i] + " ");
+                            linhaEditada.append(split[i]).append(" ");
                         }
                     }
-
-                    textoVazio.append(linhaEditada).append(System.lineSeparator());
+                    textoVazio.append(linhaEditada.toString()
+                            .trim()).append(System.lineSeparator());
+                } else {
+                    textoVazio.append(linha).append(System.lineSeparator());
                 }
             }
             bufferedReader.close();
             fileReader.close();
 
             FileWriter fileWriter = new FileWriter(arquivo);
-            BufferedWriter bufferedWriter= new BufferedWriter(fileWriter);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             bufferedWriter.write(textoVazio.toString());
             bufferedWriter.close();
             fileWriter.close();
 
             System.out.println("Contato editado com sucesso!");
+            return;
 
         } catch (IOException e) {
             System.err.println("Erro ao editar contato!" + e.getMessage());
         }
-
     }
     public static boolean sair(){
         return false;
